@@ -1,45 +1,61 @@
 # kit-playwright
 
-A minimal Playwright project for end-to-end testing a JavaScript library across multiple devices.
+Playwright boilerplate for testing JSON-driven timeline scenarios against a black-page DOM.
+
+## Running
+
+```bash
+pnpm i
+npx playwright install   # first time only
+```
+
+```bash
+pnpm test # runs all scenarios across all devices
+npx playwright test tests/timeline.spec.js --ui
+```
+
+The config auto-starts a local static server on port 3000.
+
+## Devices
+
+Edit `devices.json` to change target devices. Any name from the [Playwright device list](https://playwright.dev/docs/emulation#devices) works.
+
+```json
+["Desktop Chrome", "Desktop Firefox", "iPhone 13", "Pixel 5"]
+```
 
 ## Project structure
 
 ```
 kit-playwright/
 ├── src/
-│   ├── lib.js        # The JavaScript library under test
-│   └── main.html     # HTML page that loads and exercises the library
+│   └── main.html          # Full-screen black page with a centered #stage div
+├── scenarios/
+│   └── example.json       # Example timeline scenario
 ├── tests/
-│   └── example.spec.js  # Example Playwright tests
-├── devices.json      # List of devices to test against
-├── playwright.config.js
-└── package.json
+│   └── timeline.spec.js   # Auto-discovers and runs all scenarios
+├── devices.json           # Target devices
+└── playwright.config.js
 ```
 
-## Input files
+## How it works
 
-| File | Purpose |
-|------|---------|
-| `src/lib.js` | Library with `greet()`, `add()`, `subtract()`, `multiply()`, `divide()` |
-| `src/main.html` | Page that imports the library and renders its output |
-| `devices.json` | Array of Playwright device names — edit this to add/remove devices |
+1. Drop `.json` files into `scenarios/`. Each file is a timeline: an array of events sorted by `milliseconds`.
+2. `timeline.spec.js` generates one test per file, replays the events in real-time, and asserts the DOM reacted.
+3. `main.html` listens for `kit:message` custom events and exposes `data-last-type` / `data-last-json` on `#stage` for assertions. Add your own DOM handlers there.
 
-## Devices
-
-Edit `devices.json` to change the target devices:
+## Scenario format
 
 ```json
-["Desktop Chrome", "Desktop Firefox", "iPhone 13", "Pixel 5"]
+[
+  { "milliseconds": 0, "type": "show", "json": "{\"text\": \"Hello\"}" },
+  { "milliseconds": 500, "type": "update", "json": "{\"text\": \"World\"}" },
+  { "milliseconds": 1000, "type": "hide", "json": "{}" }
+]
 ```
 
-Any name from the [Playwright device list](https://playwright.dev/docs/emulation#devices) can be used.
-
-## Running the tests
-
-```bash
-npm install
-npx playwright install   # install browsers once
-npm test                 # run all tests across all devices
-```
-
-The config starts a local static server (via `serve`) automatically before the tests run.
+| Field          | Type   | Description                                 |
+| -------------- | ------ | ------------------------------------------- |
+| `milliseconds` | number | When the event fires relative to test start |
+| `type`         | string | Event type, matched in `main.html` handlers |
+| `json`         | string | Payload, JSON-encoded string                |

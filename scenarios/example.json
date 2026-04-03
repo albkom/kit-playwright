@@ -1,0 +1,17 @@
+[
+  {
+    "milliseconds": 0,
+    "type": "show",
+    "json": "{\"id\": \"1\", \"type\": \"show\", \"jsData\": \"DISCLAIMER\"}"
+  },
+  {
+    "milliseconds": 500,
+    "type": "update",
+    "json": "{\"id\": \"1\", \"type\": \"update\", \"jsData\": \"World\"}"
+  },
+  {
+    "milliseconds": 1000,
+    "type": "hide",
+    "json": "{\"id\": \"1\", \"type\": \"hide\"}"
+  }
+]

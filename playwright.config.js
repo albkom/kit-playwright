@@ -1,15 +1,20 @@
 // @ts-check
 const { defineConfig, devices } = require('@playwright/test');
-const deviceNames = require('./devices.json');
+const deviceEntries = require('./devices.json');
 
 /**
  * Map each device name listed in devices.json to a Playwright project.
+ * Entries can be a string (built-in Playwright device name) or an object
+ * with { name, viewport, userAgent } for custom devices.
  * To add or remove devices, edit devices.json.
  */
-const projects = deviceNames.map((name) => ({
-  name,
-  use: { ...devices[name] },
-}));
+const projects = deviceEntries.map((entry) => {
+  if (typeof entry === 'string') {
+    return { name: entry, use: { ...devices[entry] } };
+  }
+  const { name, ...use } = entry;
+  return { name, use };
+});
 
 module.exports = defineConfig({
   testDir: './tests',

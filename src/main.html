@@ -4,52 +4,71 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kit Playwright</title>
+    <script src="./lib.js"></script>
     <style>
-      body {
-        font-family: sans-serif;
-        max-width: 600px;
-        margin: 2rem auto;
-        padding: 0 1rem;
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+      #stage {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-family: 'Courier New', Courier, monospace;
       }
-      h1 { color: #333; }
-      table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
-      th, td { border: 1px solid #ccc; padding: 0.5rem 1rem; text-align: left; }
-      th { background: #f5f5f5; }
+      .content-area, .command-area {
+        width: 80%;
+        max-width: 600px;
+        height: 100%;
+        max-height: 100%;
+        margin: 10px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+      }
     </style>
   </head>
   <body>
-    <h1 id="greeting"></h1>
+    <div id="stage">
+      <div data-role="content-area" class="content-area"></div>
+      <div data-role="command-area" class="command-area"></div>
+    </div>
 
-    <h2>Arithmetic results</h2>
-    <table>
-      <thead>
-        <tr><th>Operation</th><th>Result</th></tr>
-      </thead>
-      <tbody id="results"></tbody>
-    </table>
-
-    <script src="lib.js"></script>
     <script>
-      // Greeting
-      document.getElementById('greeting').textContent = lib.greet('World');
+      const stage = document.getElementById('stage');
 
-      // Arithmetic demo
-      const operations = [
-        { label: '3 + 4',       value: lib.add(3, 4) },
-        { label: '10 - 3',      value: lib.subtract(10, 3) },
-        { label: '6 × 7',       value: lib.multiply(6, 7) },
-        { label: '15 ÷ 3',      value: lib.divide(15, 3) },
-        { label: '8 ÷ 0',       value: lib.divide(8, 0) },
-      ];
+      // Listen for timeline messages dispatched by the test runner.
+      // Each event carries { type, json } where json is a JSON string.
+      // Add your own handlers below to update the DOM based on type.
+      window.addEventListener('kit:message', (e) => {
+        const { type, json } = e.detail;
+        // Track the last received event for test assertions.
+        stage.dataset.lastType = type;
 
-      const tbody = document.getElementById('results');
-      operations.forEach(({ label, value }) => {
-        const row = tbody.insertRow();
-        row.insertCell().textContent = label;
-        const cell = row.insertCell();
-        cell.textContent = value;
-        cell.dataset.result = value;
+        // TODO - Add target event handler
+        lib.handleMessage(json);
       });
+    </script>
+    <script>
+      (function () {
+        const params = new URLSearchParams(location.search);
+        const scenario = params.get('scenario');
+        if (!scenario) return;
+        fetch('/scenarios/' + encodeURIComponent(scenario) + '.json')
+          .then(function (r) { return r.json(); })
+          .then(function (timeline) {
+            timeline
+              .sort(function (a, b) { return a.milliseconds - b.milliseconds; })
+              .forEach(function (event) {
+                setTimeout(function () {
+                  window.dispatchEvent(
+                    new CustomEvent('kit:message', { detail: { type: event.type, json: event.json } })
+                  );
+                }, event.milliseconds);
+              });
+          });
+      }());
     </script>
   </body>
 </html>

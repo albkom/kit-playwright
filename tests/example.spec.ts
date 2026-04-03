@@ -1,5 +1,4 @@
-// @ts-check
-const { test, expect } = require('@playwright/test');
+import { test, expect } from '@playwright/test';
 
 test.describe('lib.js — greeting', () => {
   test.beforeEach(async ({ page }) => {

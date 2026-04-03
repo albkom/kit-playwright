@@ -9,6 +9,8 @@
     "dev": "npx serve . --listen 3001 --no-clipboard"
   },
   "devDependencies": {
-    "@playwright/test": "^1.43.0"
+    "@playwright/test": "^1.43.0",
+    "@types/node": "^25.5.0",
+    "typescript": "^6.0.2"
   }
 }

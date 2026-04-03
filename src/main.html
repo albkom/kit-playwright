@@ -53,9 +53,9 @@
     <script>
       (function () {
         const params = new URLSearchParams(location.search);
-        const scenario = params.get('scenario');
-        if (!scenario) return;
-        fetch('/scenarios/' + encodeURIComponent(scenario) + '.json')
+        const timeline = params.get('timeline');
+        if (!timeline) return;
+        fetch('/timelines/' + encodeURIComponent(timeline) + '.json')
           .then(function (r) { return r.json(); })
           .then(function (timeline) {
             timeline

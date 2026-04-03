@@ -11,7 +11,7 @@ npx playwright install   # first time only
 
 ```bash
 pnpm test # runs all scenarios across all devices
-npx playwright test tests/timeline.spec.js --ui
+pnpm test-ui
 ```
 
 The config auto-starts a local static server on port 3000.

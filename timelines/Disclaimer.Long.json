@@ -2,7 +2,7 @@
   {
     "milliseconds": 0,
     "type": "show",
-    "json": "{\"id\": \"1\", \"type\": \"show\", \"jsData\": \"DISCLAIMER\"}"
+    "json": "DISCLAIMER_LONG"
   },
   {
     "milliseconds": 500,

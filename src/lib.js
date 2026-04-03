@@ -103,6 +103,58 @@ const lib = {
         // Check initial scroll position in case content fits without scrolling
         verifyScroll();
       }
+
+      if (json === 'CANVAS_TESTING') {
+        const canvas = document.createElement('canvas');
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        contentArea.appendChild(canvas);
+
+        function drawShapes() {
+          const w = canvas.clientWidth;
+          const h = canvas.clientHeight;
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, w, h);
+
+          const cols = 2, rows = 2;
+          const cellW = w / cols;
+          const cellH = h / rows;
+          const r = Math.min(cellW, cellH) * 0.3;
+
+          ctx.fillStyle = '#44aaff';
+
+          for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+              const cx = cellW * col + cellW / 2;
+              const cy = cellH * row + cellH / 2;
+
+              if (w < 300) {
+                // rectangle on small screens
+                ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+              } else if (w >= 500) {
+                // triangle on large screens
+                ctx.beginPath();
+                ctx.moveTo(cx, cy - r);
+                ctx.lineTo(cx + r, cy + r);
+                ctx.lineTo(cx - r, cy + r);
+                ctx.closePath();
+                ctx.fill();
+              } else {
+                // circle on medium screens
+                ctx.beginPath();
+                ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                ctx.fill();
+              }
+            }
+          }
+        }
+
+        const observer = new ResizeObserver(drawShapes);
+        observer.observe(canvas);
+        drawShapes();
+      }
     } catch (error) {
       console.error("Invalid JSON:", error);
     }
